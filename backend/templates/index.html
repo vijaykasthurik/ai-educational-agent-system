@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduAgent AI - Intelligent Educational Content Generation</title>
+    <meta name="description" content="AI-powered educational content generator with intelligent review and refinement">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</head>
+
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loader-content">
+            <div class="hex-loader">
+                <div class="hex-inner"></div>
+            </div>
+            <div class="loading-text">Generating Content</div>
+            <div id="loadingStep" class="loading-step">Initializing AI...</div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <!-- Professional Geometric Logo -->
+                <div class="logo-icon">
+                    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="logoGold" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#d4af37" />
+                                <stop offset="100%" style="stop-color:#aa8c2c" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M20 4L4 12v16l16 8 16-8V12L20 4z" stroke="url(#logoGold)" stroke-width="2"
+                            fill="none" />
+                        <path d="M20 10l-8 4v8l8 4 8-4v-8l-8-4z" fill="url(#logoGold)" fill-opacity="0.1" />
+                        <path d="M20 14v12M14 17l6 3 6-3" stroke="url(#logoGold)" stroke-width="2"
+                            stroke-linecap="round" />
+                        <circle cx="20" cy="20" r="1.5" fill="#d4af37" />
+                    </svg>
+                </div>
+                <div class="logo-text-group">
+                    <span class="logo-main">EduAgent</span>
+                    <span class="logo-sub">AI</span>
+                </div>
+            </div>
+            <p class="tagline">Intelligent Educational Content Generation</p>
+        </header>
+
+        <!-- Input Section -->
+        <section class="input-section">
+            <div class="input-grid">
+                <div class="input-group">
+                    <label class="input-label" for="grade">Grade Level</label>
+                    <input type="number" id="grade" class="input-field" placeholder="e.g., 4" min="1" max="12"
+                        value="4">
+                </div>
+                <div class="input-group">
+                    <label class="input-label" for="topic">Topic</label>
+                    <input type="text" id="topic" class="input-field"
+                        placeholder="Enter educational topic (e.g., Types of angles)">
+                </div>
+            </div>
+            <button id="generateBtn" class="generate-btn gold-shine" onclick="runPipeline()">
+                <span class="btn-icon">
+                    <svg viewBox="0 0 24 24" fill="none" class="sparkle-icon">
+                        <path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z" fill="currentColor" />
+                    </svg>
+                </span>
+                <span>Generate Content</span>
+            </button>
+        </section>
+
+        <!-- Pipeline Flow Indicator -->
+        <div class="pipeline-flow">
+            <div id="step1" class="pipeline-step">
+                <span class="step-icon">📥</span>
+                <span class="step-label">Input</span>
+            </div>
+            <span class="pipeline-arrow">→</span>
+            <div id="step2" class="pipeline-step">
+                <span class="step-icon">🤖</span>
+                <span class="step-label">Generator</span>
+            </div>
+            <span class="pipeline-arrow">→</span>
+            <div id="step3" class="pipeline-step">
+                <span class="step-icon">🔍</span>
+                <span class="step-label">Reviewer</span>
+            </div>
+            <span class="pipeline-arrow">→</span>
+            <div id="step4" class="pipeline-step">
+                <span class="step-icon">✅</span>
+                <span class="step-label">Output</span>
+            </div>
+        </div>
+
+        <!-- Output Section -->
+        <section id="outputSection" class="output-section">
+            <!-- Empty State -->
+            <div id="emptyState" class="empty-state">
+                <div class="empty-icon">✨</div>
+                <p class="empty-text">Enter a grade and topic, then click Generate to create educational content</p>
+            </div>
+
+            <!-- Generator Output Card -->
+            <div id="generatorCard" class="output-card" style="display: none;">
+                <div class="card-header">
+                    <div class="card-title-wrap">
+                        <div class="card-icon generator">🤖</div>
+                        <h2 class="card-title">Generator Output</h2>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="explanation-section">
+                        <h3 class="section-title">📚 Explanation</h3>
+                        <p id="explanationText" class="explanation-text"></p>
+                    </div>
+                    <div class="mcq-section">
+                        <h3 class="section-title">❓ Multiple Choice Questions</h3>
+                        <div id="mcqContainer"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviewer Output Card -->
+            <div id="reviewerCard" class="output-card" style="display: none;">
+                <div class="card-header">
+                    <div class="card-title-wrap">
+                        <div class="card-icon reviewer">🔍</div>
+                        <h2 class="card-title">Reviewer Feedback</h2>
+                    </div>
+                    <span id="reviewStatus" class="status-badge">--</span>
+                </div>
+                <div class="card-content">
+                    <div id="reviewerContent"></div>
+                </div>
+            </div>
+
+            <!-- Refined Output Card -->
+            <div id="refinedCard" class="output-card" style="display: none;">
+                <div class="card-header">
+                    <div class="card-title-wrap">
+                        <div class="card-icon refined">✨</div>
+                        <h2 class="card-title">Refined Output</h2>
+                    </div>
+                    <span class="status-badge pass">IMPROVED</span>
+                </div>
+                <div class="card-content">
+                    <div class="explanation-section">
+                        <h3 class="section-title">📚 Refined Explanation</h3>
+                        <p id="refinedExplanation" class="explanation-text"></p>
+                    </div>
+                    <div class="mcq-section">
+                        <h3 class="section-title">❓ Refined Questions</h3>
+                        <div id="refinedMcqContainer"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+
+</html>
